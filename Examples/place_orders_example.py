@@ -25,7 +25,7 @@ contract_stk.exchange = "SMART"
 contract_stk.primaryExchange = "ARCA"
 
 # Contract object: CRYPTO
-contract_crypto = Contract();
+contract_crypto = Contract()
 contract_crypto.symbol = "ETH"
 contract_crypto.secType = "CRYPTO"
 contract_crypto.currency = "USD"
