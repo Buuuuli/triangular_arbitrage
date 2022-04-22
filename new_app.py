@@ -20,12 +20,36 @@ import threading
 import dash_table as dt
 
 
+
+from function import *
+
+
+from ibapi.client import EClient
+from ibapi.wrapper import EWrapper
+from ibapi.contract import Contract
+from datetime import datetime
+
+import threading
+import time
+import pandas
+from pandas import DataFrame
+
+
+
+
+
+
 default_hostname = '127.0.0.1' # change it if needed
 default_port = 7497   # change it if needed
 default_client_id = 10645 # change it if needed
 
 
-df = pd.read_csv()
+reqId_serial = 1
+
+
+currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD']
+
+
 
 app = dash.Dash(__name__)
 
@@ -37,17 +61,22 @@ html.Div([
 
     html.H4('Acceptable Currency'),
     html.Img(src="asset/currency.jpeg"),
-    html.Div(id="table1"),
     html.Button('Arbitrage', id='check-button', n_clicks=0),
     html.Div(
-        id='my_output'
-    )
+        id='my_output1'
+    ),
+    html.Div(
+            id='my_output2'
+        )
+
 ])
 
 
 @app.callback(
     # We're going to output the result to trade-output
-    Output(component_id='my_output', component_property='children'),
+    [Output(component_id='my_output1', component_property='children'),
+     Output(component_id='my_output2', component_property='children')],
+
 
     # Only run this callback function when the trade-button is pressed
     Input('trade-button', 'n_clicks'),
@@ -58,6 +87,13 @@ html.Div([
 def trade(n_clicks):
 
     if n_clicks >=1:
+
+        exchange_table = fetch_all(currencies)
+
+        data = exchange_table.to_dict('rows')
+        columns =  [{"name": i, "id": i,} for i in (exchange_table.columns)]
+
+
 
         #return1 = optimal_function1
         #return2 = optimal_function2
@@ -109,8 +145,6 @@ def trade(n_clicks):
         #c2 = place_order(contract2, order2)
         #c3 = place_order(contract3, order3)
 
-        data = df.to_dict('rows')
-        columns = [{"name": i, "id": i, } for i in (df.columns)]
 
         # msg = html.Div(id='optimal route', children= # return of optimal_route_function
         # , style={'margin-bottom': '50px', 'text-align': 'center'}),
