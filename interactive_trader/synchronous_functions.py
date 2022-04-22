@@ -102,6 +102,7 @@ def fetch_historical_data(contract, endDateTime='', durationStr='30 D',
 
     def run_loop():
         app.run()
+        print('api_thread ended')
     api_thread = threading.Thread(target=run_loop, daemon=True)
     api_thread.start()
     start_time = datetime.now()
@@ -109,12 +110,14 @@ def fetch_historical_data(contract, endDateTime='', durationStr='30 D',
         time.sleep(0.01)
         if (datetime.now() - start_time).seconds > timeout_sec:
             app.disconnect()
+            print('time out #1')
             raise Exception(
                 "fetch_historical_data",
                 "timeout",
                 "next_valid_id not received"
             )
     tickerId = app.next_valid_id
+    print('tickerId = ' + str(tickerId))
     app.reqHistoricalData(
         tickerId, contract, endDateTime, durationStr, barSizeSetting,
         whatToShow, useRTH, formatDate=1, keepUpToDate=False, chartOptions=[])
@@ -123,12 +126,14 @@ def fetch_historical_data(contract, endDateTime='', durationStr='30 D',
         time.sleep(0.01)
         if (datetime.now() - start_time).seconds > timeout_sec:
             app.disconnect()
+            print('time out #2')
             raise Exception(
                 "fetch_historical_data",
                 "timeout",
                 "historical_data not received"
             )
     app.disconnect()
+    api_thread.join()
     return app.historical_data
 
 def fetch_contract_details(contract, hostname=default_hostname,

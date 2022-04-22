@@ -7,7 +7,7 @@
 from ibapi.contract import Contract
 from interactive_trader import *
 
-value = "EUR.USD" # This is what your text input looks like on your app
+value = "JPY.AUD" # This is what your text input looks like on your app
 
 # Create a contract object
 contract = Contract()
