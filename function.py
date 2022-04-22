@@ -2,7 +2,7 @@ from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
 from ibapi.contract import Contract
 from datetime import datetime
-
+from math import isnan
 import threading
 import time
 import pandas
@@ -74,4 +74,17 @@ def fetch_all(curr_list):
             else:
                 matrix[curr_list[i]][curr_list[j]] = fetch_exc_rate(curr_list[i], curr_list[j])
     return matrix
+
+
+def fill_in_nan(matrix):
+    for col in matrix.columns:
+        for row in matrix.index:
+            if isnan(matrix[col][row]) & (not isnan(matrix[row][col])):
+                matrix[col][row] = 1 / matrix[row][col]
+    return matrix
+
+
+
+def check_all_data(matrix):
+    return not matrix.isnull().values.any()
 

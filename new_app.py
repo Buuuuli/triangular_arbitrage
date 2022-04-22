@@ -88,7 +88,11 @@ def trade(n_clicks):
 
     if n_clicks >=1:
 
-        exchange_table = fetch_all(currencies)
+        exchange_dataframe = fetch_all(currencies)
+
+        exchange_dataframe = fill_in_nan(exchange_dataframe)
+
+        exchange_table = check_all_data(exchange_dataframe)
 
         data = exchange_table.to_dict('rows')
         columns =  [{"name": i, "id": i,} for i in (exchange_table.columns)]
