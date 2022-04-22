@@ -88,3 +88,20 @@ def fill_in_nan(matrix):
 def check_all_data(matrix):
     return not matrix.isnull().values.any()
 
+
+def check_arbitrage(result_dict, matrix, curr1, curr2, curr3):
+    arbitrage_amount = matrix[curr1][curr2] * matrix[curr2][curr3] * matrix[curr3][curr1] - 1
+    result_dict[curr1 + '.' + curr2 + '.' + curr3] = arbitrage_amount
+    arbitrage_amount_rev = matrix[curr1][curr3] * matrix[curr3][curr2] * matrix[curr2][curr1] - 1
+    result_dict[curr1 + '.' + curr3 + '.' + curr2] = arbitrage_amount_rev
+    print(curr1 + '->' + curr2 + '->' + curr3 + '->' + curr1 + ': ' + "{:.6f}".format(arbitrage_amount))
+    print(curr1 + '->' + curr3 + '->' + curr2 + '->' + curr1 + ': ' + "{:.6f}".format(arbitrage_amount_rev))
+    return arbitrage_amount
+
+
+def check_all_arbitrage(result_dict, matrix, currency_list):
+    for i in range(0, len(currency_list)):
+        for j in range(i + 1, len(currency_list)):
+            for k in range(j + 1, len(currency_list)):
+                check_arbitrage(result_dict, matrix, currency_list[i], currency_list[j], currency_list[k])
+    return result_dict
