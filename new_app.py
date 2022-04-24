@@ -17,7 +17,8 @@ from ibapi.contract import Contract
 from ibapi.order import Order
 import time
 import threading
-import dash_table as dt
+from dash import dash_table
+from function import *
 
 
 default_hostname = '127.0.0.1' # change it if needed
@@ -25,7 +26,9 @@ default_port = 7497   # change it if needed
 default_client_id = 10645 # change it if needed
 
 
-df = pd.read_csv()
+currencies = ['USD','EUR','GBP','JPY','AUD']
+
+reqID_serial = 1
 
 app = dash.Dash(__name__)
 
@@ -37,20 +40,21 @@ html.Div([
 
     html.H4('Acceptable Currency'),
     html.Img(src="asset/currency.jpeg"),
-    html.Div(id="table1"),
     html.Button('Arbitrage', id='check-button', n_clicks=0),
+    html.Div(id="table1"),
     html.Div(
-        id='my_output'
+        id='optimal_route'
     )
 ])
 
 
 @app.callback(
     # We're going to output the result to trade-output
-    Output(component_id='my_output', component_property='children'),
+    [Output(component_id='table1', component_property='children'),
+     Output(component_id='my_output', component_property='children')],
 
     # Only run this callback function when the trade-button is pressed
-    Input('trade-button', 'n_clicks'),
+    Input('check-button', 'n_clicks'),
 
     prevent_initial_call=True
 )
@@ -58,68 +62,34 @@ html.Div([
 def trade(n_clicks):
 
     if n_clicks >=1:
+        exchange_datadrame = fetch_all(currencies)
 
-        #return1 = optimal_function1
-        #return2 = optimal_function2
-        #return3 = optimal_function3
+        exchange_datadrame = fill_in_nan(exchange_datadrame)
 
-
-        #contract1 = Contract()
-        #contract1.symbol = #optimal_Contract_Symbol1
-        #contract1.secType = #SecType
-        #contract1.currency = #currency
-        #contract1.exchange = #exchange
-        #contract1.primaryExchange = #primaryExchange
-
-        #contract2 = Contract()
-        #contract2.symbol = #optimal_Contract_Symbol2
-        #contract2.secType = #SecType
-        #contract2.currency = #currency
-        #contract2.exchange = #exchange
-        #contract2.primaryExchange = #primaryExchange
-
-        #contract3 = Contract()
-        #contract3.symbol = #optimal_Contract_Symbol3
-        #contract3.secType = #SecType
-        #contract3.currency = #currency
-        #contract3.exchange = #exchange
-        #contract3.primaryExchange = #primaryExchange
+        if not check_all_data(exchange_datadrame):
+            print('Exchange Data Unavailable')
+            exit(1)
 
 
-        #order1 = Order()
-        #order1.action = #buy_or_sell
-        #order1.orderType = #'MKT'
-        #order1.totalQuantity = #trade_amt
-        #order1.lmtPrice = #mktPrice
-
-        #order2 = Order()
-        #order2.action =  # buy_or_sell
-        #order2.orderType =  # 'MKT'
-        #order2.totalQuantity =  # trade_amt
-        #order2.lmtPrice =  # mktPrice
-
-        #order3 = Order()
-        #order3.action =  # buy_or_sell
-        #order3.orderType =  # 'MKT'
-        #order3.totalQuantity =  # trade_amt
-        #order3.lmtPrice =  # mktPrice
 
 
-        #c1 = place_order(contract1, order1)
-        #c2 = place_order(contract2, order2)
-        #c3 = place_order(contract3, order3)
+        data = exchange_datadrame.to_dict('rows')
+        columns = [{"name": i, "id": i, } for i in (exchange_datadrame.columns)]
 
-        data = df.to_dict('rows')
-        columns = [{"name": i, "id": i, } for i in (df.columns)]
+        results = dict()
+
+        results = [{'name': i,'id': i} for i in (exchange_datadrame)]
+
+        optimal_route_str = max(results, key=results.get)
 
         # msg = html.Div(id='optimal route', children= # return of optimal_route_function
         # , style={'margin-bottom': '50px', 'text-align': 'center'}),
 
 
-        return dt.DataTable(data=data, columns=columns), msg
+        return dash_table.DataTable(data=data, columns=columns), optimal_route_str
 
     else:
-        return "please click the button"
+        return "please click the check button"
 
 
 
