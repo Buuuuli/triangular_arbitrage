@@ -67,8 +67,31 @@ app.layout = html.Div([
     html.Div(
         id='my_output1'
     ),
+    html.Br(),
+    html.Br(),
     html.Div(
-        id='my_output2')
+        id='my_output2'),
+    html.Br(),
+    html.Br(),
+    html.Button('trade', id='trade-button', n_clicks=0,
+                style={
+                    'marginRight': '50px',
+                    'textAlign': 'center',
+                    'position': 'absolute',
+                    'left': '50%',
+                    'transform': 'translateX(-50%)',
+                    'display': 'inline-block',
+                    'width': '50%',
+
+                }),
+    html.Br(),
+    html.Br(),
+    html.Div(
+        id='my_output3')
+
+
+
+
 
    ])
 
@@ -85,7 +108,7 @@ app.layout = html.Div([
     prevent_initial_call=True
 )
 
-def trade(n_clicks):
+def arbitrage(n_clicks):
 
     if n_clicks >=1:
 
@@ -111,6 +134,24 @@ def trade(n_clicks):
 
     else:
         return "please click the button"
+
+@app.callback(
+    # We're going to output the result to trade-output
+    Output(component_id='my_output3', component_property='children'),
+
+    # Only run this callback function when the trade-button is pressed
+    Input('trade-button', 'n_clicks'),
+
+    prevent_initial_call=True
+)
+
+def trade(n_clicks):
+    if n_clicks>=1:
+        return
+
+    else:
+        msg = 'order is not completed'
+        return msg
 
 
 if __name__ == '__main__':
