@@ -55,7 +55,9 @@ def request_data(contract):
                           barSizeSetting='1 day',
                           whatToShow='MIDPOINT', useRTH=0, formatDate=1, keepUpToDate=False, chartOptions=[])
     time.sleep(0.5)
-    if len(app.data) > 0 & app.data[len(app.data) - 1][0] != reqId_serial:
+    if len(app.data) == 0:
+        return float('NaN')
+    elif app.data[len(app.data) - 1][0] != reqId_serial:
         return float('NaN')
     else:
         return app.data[len(app.data) - 1][2]

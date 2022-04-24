@@ -61,20 +61,22 @@ currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD']
 exchange_dataframe = fetch_all(currencies)
 
 exchange_dataframe = fill_in_nan(exchange_dataframe)
+if not check_all_data(exchange_dataframe):
+    print('Exchange Data Unavailable')
+    exit(1)
 
-exchange_table = check_all_data(exchange_dataframe)
 
-#data = exchange_table.to_dict('rows')
-#columns = [{"name": i, "id": i, } for i in (exchange_table.columns)]
+#data = exchange_dataframe.to_dict('rows')
+#columns = [{"name": i, "id": i, } for i in (exchange_dataframe.columns)]
 
 results = dict()
-results = check_all_arbitrage(results, exchange_table, currencies)
+results = check_all_arbitrage(results, exchange_dataframe, currencies)
 
 optimal_route_str = max(results, key=results.get)
 
-currency1 = optimal_route_str.split(',')[0]
-currency2 = optimal_route_str.split(',')[1]
-currency3 = optimal_route_str.split(',')[2]
+currency1 = optimal_route_str.split('.')[0]
+currency2 = optimal_route_str.split('.')[1]
+currency3 = optimal_route_str.split('.')[2]
 
 contract1 = Contract()
 contract1.symbol = currency1
@@ -99,7 +101,7 @@ contract2.exchange = 'IDEALPRO'
 order2 = Order()
 order2.action = 'BUY'
 order2.orderType = 'MKT'
-order2.totalQuantity = exchange_table[currency1].loc[[currency2]].value[0]*100000*(1-0.00002)
+order2.totalQuantity = exchange_dataframe[currency1].loc[[currency2]].value[0]*100000*(1-0.00002)
 c2 = place_order(contract2, order2)
 
 contract3 = Contract()
@@ -111,6 +113,6 @@ contract3.exchange = 'IDEALPRO'
 order3 = Order()
 order3.action = 'BUY'
 order3.orderType = 'MKT'
-order3.totalQuantity = exchange_table[currency2].loc[[currency3]].value[0]*exchange_table[currency1].loc[[currency2]].value[0]*100000*(1-0.00002)*(1-0.00002)
+order3.totalQuantity = exchange_dataframe[currency2].loc[[currency3]].value[0]*exchange_dataframe[currency1].loc[[currency2]].value[0]*100000*(1-0.00002)*(1-0.00002)
 
 c3 = place_order(contract3, order3)
