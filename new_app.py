@@ -112,6 +112,28 @@ def arbitrage(n_clicks):
 
     if n_clicks >=1:
 
+        class IBapi(EWrapper, EClient):
+            def __init__(self):
+                EClient.__init__(self, self)
+                self.data = []  # Initialize variable to store candle
+
+            def historicalData(self, reqId, bar):
+                print(f'reqId: {reqId} Time: {bar.date} Close: {bar.close}')
+                self.data.append([reqId, bar.date, bar.close])
+
+        app = IBapi()
+        app.connect('127.0.0.1', 7497, 10645)
+
+        def run_loop():
+            app.run()
+
+        reqId_serial = 1
+
+        # Start the socket in a thread
+        api_thread = threading.Thread(target=run_loop, daemon=True)
+        api_thread.start()
+        time.sleep(1)  # Sleep interval to allow time for connection to server
+
         exchange_dataframe = fetch_all(currencies)
 
         exchange_dataframe = fill_in_nan(exchange_dataframe)
