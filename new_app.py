@@ -4,7 +4,6 @@ import dash
 from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 import base64
-from interactive_trader.synchronous_functions import get_accoutsummary
 from yahoo import *
 import plotly.graph_objects as go
 
@@ -57,8 +56,8 @@ app.layout = html.Div([
 
     dcc.Loading(children=[html.Div(
         id='my_output1',
-        style={'font-weight': 'bold', 'color': 'grey','margin-right': 'auto', 'margin-left': 'auto',
-               'padding': '10','width': '70%'})
+        style={'font-weight': 'bold', 'color': 'grey', 'margin-right': 'auto', 'margin-left': 'auto',
+               'padding': '10', 'width': '70%'})
     ], type="circle"
     ),
 
@@ -96,7 +95,7 @@ app.layout = html.Div([
     html.Br(),
     html.Br(),
     dcc.Loading(),
-    dcc.Loading(children=[html.H3(id='div_profit')],
+    dcc.Loading(children=[html.P(id='div_profit',style={'text-align':'center'})],
                 type="circle",
                 ),
 
@@ -183,14 +182,12 @@ def clickaccount(n_clicks):
     prevent_initial_call=True
 )
 def trade(n_clicks):
-    time.sleep(2)
+    time.sleep(1.5)
     if n_clicks >= 1:
         if global_exchange_rate is None or global_optimal_path is None:
             return 'Exchange data unavailable, please click on arbitrage button first'
         else:
             global global_balance
-            print(global_exchange_rate)
-            print(global_optimal_path)
             profit, output_str = get_profit(global_balance,
                                             global_currency,
                                             global_exchange_rate,
@@ -237,19 +234,19 @@ def get_profit(balance, currency, matrix, path):
     if curr1 != 'USD':
         curr1_amt = balance * matrix['USD'][curr1]
         rate_usd = matrix['USD'][curr1]
-        output += f'exchange for {curr1_amt}{curr1} at the rate of {rate_usd} {curr1}/USD\n'
+        output += f'exchange for {curr1_amt:.4f} {curr1} at the rate of {rate_usd:.4f} {curr1}/USD\n'
     curr2_amt = curr1_amt * matrix[curr1][curr2]
-    output += f'exchange for {curr2_amt}{curr2} at the rate of {matrix[curr1][curr2]} {curr2}/{curr1}\n'
+    output += f'exchange for {curr2_amt:.4f} {curr2} at the rate of {matrix[curr1][curr2]:.4f} {curr2}/{curr1}\n'
     curr3_amt = curr2_amt * matrix[curr2][curr3]
-    output += f'exchange for {curr3_amt}{curr3} at the rate of {matrix[curr2][curr3]} {curr3}/{curr2}\n'
+    output += f'exchange for {curr3_amt:.4f} {curr3} at the rate of {matrix[curr2][curr3]:.4f} {curr3}/{curr2}\n'
     curr1_amt_new = curr3_amt * matrix[curr3][curr1]
-    output += f'exchange for {curr1_amt_new}{curr1} at the rate of {matrix[curr3][curr1]} {curr1}/{curr3}\n'
+    output += f'exchange for {curr1_amt_new:.4f} {curr1} at the rate of {matrix[curr3][curr1]:.4f} {curr1}/{curr3}\n'
     usd_amt = curr1_amt_new
     if curr1 != 'USD':
         usd_amt = curr1_amt_new * matrix[curr1]['USD']
-        output += f'exchange for {usd_amt} USD at the rate of {1 / rate_usd} USD/{curr1}\n'
+        output += f'exchange for {usd_amt:.4f} USD at the rate of {1 / rate_usd:.4f} USD/{curr1}\n'
     profit = usd_amt - balance
-    output += f'after the triangular trade, you earned ${profit}'
+    output += f'after the triangular trade, you earned ${profit:.4f}'
     print(output)
     return profit, output
 
