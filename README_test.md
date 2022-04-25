@@ -7,10 +7,6 @@
 [![Issues][issues-shield]][issues-url]
 
 
-
-
-
-
   <h3 align="center">Triangle Arbitrage</h3>
 
   <p align="center">
@@ -34,15 +30,11 @@
     <li>
       <a href="#getting-started">Getting Started</a>
       <ul>
-        <li><a href="#prerequisites">Prerequisites</a></li>
+        <li><a href="#App Functionality">Prerequisites</a></li>
         <li><a href="#installation">Installation</a></li>
       </ul>
     </li>
-    <li><a href="#usage">Usage</a></li>
-    <li><a href="#roadmap">Roadmap</a></li>
-    <li><a href="#contributing">Contributing</a></li>
-    <li><a href="#license">License</a></li>
-    <li><a href="#contact">Contact</a></li>
+    <li><a href="#Main Functions">Usage</a></li>
     <li><a href="#acknowledgments">Acknowledgments</a></li>
   </ol>
 </details>
@@ -69,54 +61,30 @@ This section should list any major frameworks/libraries used for the project.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
+## App Functionality
 
+1. Visualize in currencies exchange rate and trading volumn for USD, EUR, GBP, JPY, and AUD
+2. Transaction History
+3. USD Exchange rate Index(Additional Variable)
 
-<!-- GETTING STARTED -->
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 ## Getting Started
 
-This is an example of how you may give instructions on setting up your project locally.
-To get a local copy up and running follow these simple example steps.
+Basically all you need to do is link your IBKR account to our app and click our "start" button to watch the currencies market. After that, our automatic trading system will start to work, and whenever there is an opportunity, the system will begin to trade. 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Prerequisites
 
-This is an example of how to list things you need to use the software and how to install them.
-* npm
-  ```sh
-  npm install npm@latest -g
-  ```
-
-<p align="right">(<a href="#top">back to top</a>)</p>
-
-## Installation
-
-_Below is an example of how you can instruct your audience on installing and setting up your app. This template doesn't rely on any external dependencies or services._
-
-1. Get a free API Key at [https://example.com](https://example.com)
-2. Clone the repo
-   ```sh
-   git clone https://github.com/your_username_/Project-Name.git
-   ```
-3. Install NPM packages
-   ```sh
-   npm install
-   ```
-4. Enter your API in `config.js`
-   ```js
-   const API_KEY = 'ENTER YOUR API';
-   ```
+You need a username and password for our app, and an active IBKR account.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
+## Main Functions
 
-<!-- USAGE EXAMPLES -->
-## Usage
-
-Use this space to show useful examples of how a project can be used. Additional screenshots, code examples and demos work well in this space. You may also link to more resources.
-
-_For more examples, please refer to the [Documentation](https://example.com)_
+这里你来吧，function我不太熟
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
