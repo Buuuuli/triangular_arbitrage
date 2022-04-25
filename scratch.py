@@ -116,3 +116,5 @@ order3.orderType = 'MKT'
 order3.totalQuantity = exchange_dataframe[currency2].loc[[currency3]].value[0]*exchange_dataframe[currency1].loc[[currency2]].value[0]*100000*(1-0.00002)*(1-0.00002)
 
 c3 = place_order(contract3, order3)
+
+#additional variable

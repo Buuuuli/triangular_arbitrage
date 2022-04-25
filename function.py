@@ -107,3 +107,4 @@ def check_all_arbitrage(result_dict, matrix, currency_list):
             for k in range(j + 1, len(currency_list)):
                 check_arbitrage(result_dict, matrix, currency_list[i], currency_list[j], currency_list[k])
     return result_dict
+

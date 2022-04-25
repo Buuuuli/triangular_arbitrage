@@ -22,8 +22,19 @@ def fetch_all(curr_list):
     return matrix
 
 
+def fetch_index(name):
+    data = yf.download(tickers=name, period='60d', interval='1d')
+    if len(data) == 0:
+        return float("nan")
+    else:
+        return data
+
+
 if __name__ == '__main__':
     # currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD']
     # exchange_rate = fetch_all(currencies)
     # print(exchange_rate)
-    fetch_exc_rate('PEN','ARS')
+    # fetch_exc_rate('PEN', 'ARS')
+    ex_index = fetch_index('DX-Y.NYB')
+    print(ex_index)
+    # DX-Y.NYB

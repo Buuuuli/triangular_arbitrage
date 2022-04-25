@@ -4,6 +4,8 @@ import pandas as pd
 import dash_bootstrap_components as dbc
 from dash import dcc, html
 from dash.dependencies import Input, Output, State
+import plotly.graph_objects as go
+
 from page_1 import page_1
 from order_page import order_page
 from error_page import error_page
@@ -21,6 +23,7 @@ from dash import dash_table
 import base64
 
 from function import *
+from yahoo import *
 
 from ibapi.client import EClient
 from ibapi.wrapper import EWrapper
@@ -87,13 +90,22 @@ app.layout = html.Div([
     html.Br(),
     html.Br(),
     html.Div(
-        id='my_output3')
+        id='my_output3'),
 
+    # additional variable graph
+    html.H3("Section 2: USD Exchange rate Index"),
+    html.Br(),
 
+    html.Button(
+        id='button',
+        children='update graph',
+        n_clicks=0
+    ),
+    dcc.Graph(id='candlestick-graph'),
 
+    html.Br(),
 
-
-   ])
+])
 
 
 @app.callback(
@@ -101,18 +113,16 @@ app.layout = html.Div([
     [Output(component_id='my_output1', component_property='children'),
      Output(component_id='my_output2', component_property='children')],
 
-
     # Only run this callback function when the trade-button is pressed
     Input('check-button', 'n_clicks'),
 
     prevent_initial_call=True
 )
-
 def arbitrage(n_clicks):
-
-    if n_clicks >=1:
+    if n_clicks >= 1:
 
         exchange_dataframe = fetch_all(currencies)
+        print('fetch success')
 
         exchange_dataframe = fill_in_nan(exchange_dataframe)
 
@@ -120,10 +130,10 @@ def arbitrage(n_clicks):
             print('Exchange Data Unavailable')
             exit(1)
 
-        #exchange_table = check_all_data(exchange_dataframe)
+        # exchange_table = check_all_data(exchange_dataframe)
 
         data = exchange_dataframe.to_dict('rows')
-        columns =  [{"name": i, "id": i,} for i in (exchange_dataframe.columns)]
+        columns = [{"name": i, "id": i, } for i in (exchange_dataframe.columns)]
 
         results = dict()
         results = check_all_arbitrage(results, exchange_dataframe, currencies)
@@ -135,6 +145,7 @@ def arbitrage(n_clicks):
     else:
         return "please click the button"
 
+
 @app.callback(
     # We're going to output the result to trade-output
     Output(component_id='my_output3', component_property='children'),
@@ -144,14 +155,35 @@ def arbitrage(n_clicks):
 
     prevent_initial_call=True
 )
-
 def trade(n_clicks):
-    if n_clicks>=1:
+    if n_clicks >= 1:
         return
 
     else:
         msg = 'order is not completed'
         return msg
+
+
+# additional variable
+@app.callback(
+    Output(component_id='candlestick-graph', component_property='figure'),
+    Input(component_id='button', component_property='n_clicks'))
+def display_candlestick(n_clicks):
+    df = fetch_index('DX-Y.NYB')
+    df = df.reset_index()
+    fig = go.Figure(
+        data=[go.Candlestick(
+            x=df['Date'],
+            open=df['Open'],
+            high=df['High'],
+            low=df['Low'],
+            close=df['Close']
+        )
+        ]
+    )
+
+    fig.update_layout(title='USD Exchange Rate Index')
+    return fig
 
 
 if __name__ == '__main__':
