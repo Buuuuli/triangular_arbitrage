@@ -19,24 +19,21 @@ class IBapi(EWrapper, EClient):
         self.data.append([reqId, bar.date, bar.close])
 
 
-
-
-app = IBapi()
-app.connect('127.0.0.1', 7497, 10645)
+ibkr_app = IBapi()
+ibkr_app.connect('127.0.0.1', 7497, 10645)
 
 
 def run_loop():
-    app.run()
-
+    ibkr_app.run()
 
 
 reqId_serial = 1
-
 
 # Start the socket in a thread
 api_thread = threading.Thread(target=run_loop, daemon=True)
 api_thread.start()
 time.sleep(1)  # Sleep interval to allow time for connection to server
+print('api_thread started')
 
 
 def create_contract(curr1, curr2):
@@ -48,7 +45,8 @@ def create_contract(curr1, curr2):
     contract.currency = curr2
     return contract
 
-def request_data(contract):
+
+def request_data(app, contract):
     global reqId_serial
     reqId_serial += 1
     app.reqHistoricalData(reqId=reqId_serial, contract=contract, endDateTime='', durationStr='1 D',
@@ -62,19 +60,20 @@ def request_data(contract):
     else:
         return app.data[len(app.data) - 1][2]
 
-def fetch_exc_rate(base, quote):
+
+def fetch_exc_rate(app, base, quote):
     contract = create_contract(base, quote)
-    return request_data(contract)
+    return request_data(app, contract)
 
 
-def fetch_all(curr_list):
+def fetch_all(app, curr_list):
     matrix = DataFrame(columns=curr_list, index=curr_list)
     for i in range(0, len(curr_list)):
         for j in range(0, len(curr_list)):
             if i == j:
                 matrix[curr_list[i]][curr_list[j]] = 1
             else:
-                matrix[curr_list[i]][curr_list[j]] = fetch_exc_rate(curr_list[i], curr_list[j])
+                matrix[curr_list[i]][curr_list[j]] = fetch_exc_rate(app, curr_list[i], curr_list[j])
     return matrix
 
 
@@ -84,7 +83,6 @@ def fill_in_nan(matrix):
             if isnan(matrix[col][row]) & (not isnan(matrix[row][col])):
                 matrix[col][row] = 1 / matrix[row][col]
     return matrix
-
 
 
 def check_all_data(matrix):
@@ -107,4 +105,3 @@ def check_all_arbitrage(result_dict, matrix, currency_list):
             for k in range(j + 1, len(currency_list)):
                 check_arbitrage(result_dict, matrix, currency_list[i], currency_list[j], currency_list[k])
     return result_dict
-

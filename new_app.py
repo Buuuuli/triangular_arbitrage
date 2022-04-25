@@ -1,39 +1,10 @@
 import dash
-import ibapi.wrapper
-import pandas as pd
-import dash_bootstrap_components as dbc
-from dash import dcc, html
-from dash.dependencies import Input, Output, State
-import plotly.graph_objects as go
-
-from page_1 import page_1
-from order_page import order_page
-from error_page import error_page
-from navbar import navbar
-from sidebar import sidebar, SIDEBAR_HIDDEN, SIDEBAR_STYLE
+from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
-from dash.exceptions import PreventUpdate
 from interactive_trader import *
-from datetime import datetime
-from ibapi.contract import Contract
-from ibapi.order import Order
-import time
-import threading
-from dash import dash_table
 import base64
-
 from function import *
 from yahoo import *
-
-from ibapi.client import EClient
-from ibapi.wrapper import EWrapper
-from ibapi.contract import Contract
-from datetime import datetime
-
-import threading
-import time
-import pandas
-from pandas import DataFrame
 
 reqId_serial = 1
 
@@ -41,6 +12,22 @@ currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD']
 
 image = 'asset/currency.jpeg'
 test_base64 = base64.b64encode(open(image, 'rb').read()).decode('ascii')
+
+# ==========================================
+exchange_dataframe = fetch_all(ibkr_app, currencies)
+exchange_dataframe = fill_in_nan(exchange_dataframe)
+if not check_all_data(exchange_dataframe):
+    print('Exchange Data Unavailable')
+    exit(1)
+# exchange_table = check_all_data(exchange_dataframe)
+data = exchange_dataframe.to_dict('rows')
+columns = [{"name": i, "id": i, } for i in exchange_dataframe.columns]
+results = dict()
+results = check_all_arbitrage(results, exchange_dataframe, currencies)
+optimal_route_str = max(results, key=results.get)
+print(results)
+print(optimal_route_str)
+# ===========================
 
 app = dash.Dash(__name__)
 server = app.server
