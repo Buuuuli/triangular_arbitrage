@@ -70,16 +70,10 @@ This is Duke Fintech 533 final project(2022 Spring) for Team Triangle SWAT. We a
 
 ### Built With
 
-This section should list any major frameworks/libraries used to bootstrap your project. Leave any add-ons/plugins for the acknowledgements section. Here are a few examples.
+This section should list any major frameworks/libraries used for the project.
 
-* [Next.js](https://nextjs.org/)
-* [React.js](https://reactjs.org/)
-* [Vue.js](https://vuejs.org/)
-* [Angular](https://angular.io/)
-* [Svelte](https://svelte.dev/)
-* [Laravel](https://laravel.com)
-* [Bootstrap](https://getbootstrap.com)
-* [JQuery](https://jquery.com)
+* [Dash](https://plotly.com/dash/)
+* [IBKR API](https://www.interactivebrokers.com/en/index.php?f=5039)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
