@@ -5,6 +5,7 @@ from interactive_trader import *
 import base64
 from function import *
 from yahoo import *
+import plotly.graph_objects as go
 
 reqId_serial = 1
 
@@ -14,35 +15,39 @@ image = 'asset/currency.jpeg'
 test_base64 = base64.b64encode(open(image, 'rb').read()).decode('ascii')
 
 # ==========================================
-exchange_dataframe = fetch_all(ibkr_app, currencies)
-exchange_dataframe = fill_in_nan(exchange_dataframe)
-if not check_all_data(exchange_dataframe):
-    print('Exchange Data Unavailable')
-    exit(1)
-# exchange_table = check_all_data(exchange_dataframe)
-data = exchange_dataframe.to_dict('rows')
-columns = [{"name": i, "id": i, } for i in exchange_dataframe.columns]
-results = dict()
-results = check_all_arbitrage(results, exchange_dataframe, currencies)
-optimal_route_str = max(results, key=results.get)
-print(results)
-print(optimal_route_str)
+# exchange_dataframe = fetch_all(ibkr_app, currencies)
+# exchange_dataframe = fill_in_nan(exchange_dataframe)
+# if not check_all_data(exchange_dataframe):
+#     print('Exchange Data Unavailable')
+#     exit(1)
+# # exchange_table = check_all_data(exchange_dataframe)
+# data = exchange_dataframe.to_dict('rows')
+# columns = [{"name": i, "id": i, } for i in exchange_dataframe.columns]
+# results = dict()
+# results = check_all_arbitrage(results, exchange_dataframe, currencies)
+# optimal_route_str = max(results, key=results.get)
+# print(results)
+# print(optimal_route_str)
 # ===========================
 
 app = dash.Dash(__name__)
 server = app.server
 
 app.layout = html.Div([
+    html.Div([
+        html.H1('Triangular Arbitrage')], style={'color': '#3258a8', 'fontSize': 14, 'textAlign': 'center',
+                                                 'marginBottom': 50, 'marginTop': 25}),
 
-    html.Div([html.H1('Acceptable Currency')], style={'color': 'blue', 'fontSize': 14, 'textAlign': 'center',
-                                                      'marginBottom': 50, 'marginTop': 25}),
-
+    html.H2("Section 1: Asset Pool"),
     html.Div([
         html.Img(src='data:image/png;base64,{}'.format(test_base64))],
-        style={'textAlign': 'center', 'height': '10%', 'width': '10%'}),
+        style={'textAlign': 'center', 'height': '10%', 'width': '8%'}),
     html.Br(),
     html.Br(),
     html.Br(),
+
+    html.H2("Section 2: Current Exchange Rate"),  # Store the current currency data table
+
     html.Button('Arbitrage', id='check-button', n_clicks=0,
                 style={
                     'marginRight': '50px',
@@ -79,8 +84,12 @@ app.layout = html.Div([
     html.Div(
         id='my_output3'),
 
+    html.H2("Section 3: Transaction History"),  # store the path of triangular arbitrage
+    html.Br(),
+    html.Br(),
+
     # additional variable graph
-    html.H3("Section 2: USD Exchange rate Index"),
+    html.H2("Section 4: USD Exchange rate Index (Additional Variable)"),
     html.Br(),
 
     html.Button(
