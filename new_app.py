@@ -32,7 +32,7 @@ app.layout = html.Div([
     html.Br(),
     html.Br(),
 
-    html.H2("Section 2: Current Exchange Rate"),  # Store the current currency data table
+    html.H2("Section 2: Current Exchange Rate Matrix"),  # Store the current currency data table
 
     html.Button('Arbitrage', id='check-button', n_clicks=0,
                 style={
@@ -45,6 +45,12 @@ app.layout = html.Div([
                     'width': '50%',
 
                 }),
+    html.Br(),
+    html.Div([
+        html.H4("Please wait around 20 seconds to process the currency data")],
+        style={'color': 'black', 'fontSize': 14, 'textAlign': 'center',
+                                                 'marginBottom': 50, 'marginTop': 25}),
+
     html.Div(
         id='my_output1'
     ),
