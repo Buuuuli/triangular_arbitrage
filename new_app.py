@@ -5,7 +5,8 @@ from interactive_trader import *
 import plotly.graph_objects as go
 import base64
 
-from interactive_trader.synchronous_functions import get_arbitrage
+from interactive_trader.synchronous_functions import get_arbitrage, get_accoutsummary
+
 from yahoo import *
 import plotly.graph_objects as go
 
@@ -84,9 +85,22 @@ app.layout = html.Div([
     html.Br(),
     html.Div(
         id='output_paths', style={'width': '50%'}),
+    html.Br(),
+    html.Br(),
+
+    html.H2("Section 4: Account Summary"),
+    html.Br(),
+    html.Button(
+        id='button_acc',
+        children='Get Account Summary',
+        n_clicks=0
+    ),
+    html.Div(
+        id='account_summary'
+    ),
 
     # additional variable graph
-    html.H2("Section 4: USD Exchange rate Index (Additional Variable)"),
+    html.H2("Section 5: USD Exchange rate Index (Additional Variable)"),
     html.Br(),
 
     html.Button(
@@ -121,6 +135,16 @@ def arbitrage(n_clicks):
         result_table = dash_table.DataTable(data=results.to_dict('rows'))
         return exchange_rate_matrix, optimal_route_str, result_table
 
+    else:
+        return "please click the button"
+
+
+@app.callback(
+    Output(component_id='account_summary', component_property='children'),
+    Input(component_id='button_acc', component_property='n_clicks'))
+def clickaccount(n_clicks):
+    if n_clicks >= 1:
+        return get_accoutsummary()
     else:
         return "please click the button"
 

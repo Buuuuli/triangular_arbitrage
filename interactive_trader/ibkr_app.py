@@ -13,6 +13,8 @@ class ibkr_app(EWrapper, EClient):
     def __init__(self):
         EClient.__init__(self, self)
         self.data = []  # Initialize variable to store candle
+        self.available_fund = 0
+        self.available_fund_currency = None
         self.error_messages = pd.DataFrame(columns=[
             'reqId', 'errorCode', 'errorString'
         ])
@@ -31,6 +33,14 @@ class ibkr_app(EWrapper, EClient):
                      'avg_fill_price', 'parent_id', 'last_fill_price',
                      'client_id', 'why_held', 'mkt_cap_price']
         )
+
+    def accountSummary(self, reqId: int, account: str, tag: str, value: str, currency: str):
+        super().accountSummary(reqId, account, tag, value, currency)
+        if tag == 'AvailableFunds':
+            self.available_fund = float(value)
+            self.available_fund_currency = currency
+        print("AccountSummary. ReqId:", reqId, "Account:", account,
+              "Tag: ", tag, "Value:", value, "Currency:", currency)
 
 
     def error(self, reqId:TickerId, errorCode:int, errorString:str):
