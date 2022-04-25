@@ -1,6 +1,10 @@
-<div align="center">
+<div id="top"></div>
 
+<!-- PROJECT SHIELDS -->
 
+[![Forks][forks-shield]][forks-url]
+[![Stargazers][stars-shield]][stars-url]
+[![Issues][issues-shield]][issues-url]
 
 
   <h3 align="center">Triangle Arbitrage</h3>
@@ -9,12 +13,31 @@
     An awesome Triangle Arbitrage App to begin quantitative finance 
 
   </p>
-
 </div>
 
 
 
-
+<!-- TABLE OF CONTENTS -->
+<details>
+  <summary>Table of Contents</summary>
+  <ol>
+    <li>
+      <a href="#about-the-project">About The Project</a>
+      <ul>
+        <li><a href="#built-with">Built With</a></li>
+      </ul>
+    </li>
+    <li>
+      <a href="#getting-started">Getting Started</a>
+      <ul>
+        <li><a href="#App Functionality">Prerequisites</a></li>
+        <li><a href="#installation">Installation</a></li>
+      </ul>
+    </li>
+    <li><a href="#Main Functions">Usage</a></li>
+    <li><a href="#acknowledgments">Acknowledgments</a></li>
+  </ol>
+</details>
 
 
 
@@ -41,15 +64,14 @@ This section should list any major frameworks/libraries used for the project.
 ## App Functionality
 
 1. Visualize in currencies exchange rate and trading volumn for USD, EUR, GBP, JPY, and AUD
-2. Check the arbitrage opportunity and place order
+2. Transaction History
 3. USD Exchange rate Index(Additional Variable)
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 ## Getting Started
 
-Basically all you need to do is link your IBKR account to our app and click our "Arbitrage" button to watch if ther is arbitrage opportunity.
-After that, our automatic trading system will start to work, and whenever there is an opportunity, you can manually trade by click the trade button. 
+Basically all you need to do is link your IBKR account to our app and click our "start" button to watch the currencies market. After that, our automatic trading system will start to work, and whenever there is an opportunity, the system will begin to trade. 
 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
@@ -58,6 +80,14 @@ After that, our automatic trading system will start to work, and whenever there 
 You need a username and password for our app, and an active IBKR account.
 
 <p align="right">(<a href="#top">back to top</a>)</p>
+
+
+## Main Functions
+
+这里你来吧，function我不太熟
+
+<p align="right">(<a href="#top">back to top</a>)</p>
+
 
 
 
@@ -75,4 +105,13 @@ Use this space to list resources you find helpful and would like to give credit 
 <p align="right">(<a href="#top">back to top</a>)</p>
 
 
+
+<!-- MARKDOWN LINKS & IMAGES -->
+<!-- https://www.markdownguide.org/basic-syntax/#reference-style-links -->
+[forks-shield]: https://img.shields.io/github/forks/Triangle-SWAT/triangular_arbitrage.svg?style=for-the-badge
+[forks-url]: https://github.com/Triangle-SWAT/triangular_arbitrage/network/members
+[stars-shield]: https://img.shields.io/github/stars/Triangle-SWAT/triangular_arbitrage.svg?style=for-the-badge
+[stars-url]: https://github.com/Triangle-SWAT/triangular_arbitrage/stargazers
+[issues-shield]: https://img.shields.io/github/issues/Triangle-SWAT/triangular_arbitrage.svg?style=for-the-badge
+[issues-url]: https://github.com/Triangle-SWAT/triangular_arbitrage/issues
 

@@ -18,6 +18,10 @@ class ibkr_app(EWrapper, EClient):
         self.error_messages = pd.DataFrame(columns=[
             'reqId', 'errorCode', 'errorString'
         ])
+        self.available_fund =0
+        self.available_fund_currency = None
+        self.initall = 'All'
+        self.iniTAF = 'AvailableFunds'
         self.next_valid_id = None
         self.current_time = None
         self.historical_data = pd.DataFrame(
@@ -159,3 +163,15 @@ class ibkr_app(EWrapper, EClient):
             ignore_index=True
         )
         self.order_status.drop_duplicates(inplace=True)
+
+
+
+
+
+    def accountSummary(self, reqId:int, account:str, tag:str, value:str,
+                       currency:str):
+        super().accountSummary(reqId,account,tag,value,currency)
+        if tag =='AvailableFunds':
+            self.available_fund=value
+            self.available_fund_currency = currency
+        print('AccountSummary. RequID:',reqId, "Account:", account, "Tag:", tag, "Value:", value, "Currency:", currency)

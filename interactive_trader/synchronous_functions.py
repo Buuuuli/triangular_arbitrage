@@ -8,6 +8,7 @@ from interactive_trader.ibkr_app import ibkr_app
 import threading
 import time
 from datetime import datetime
+from ibapi.order import Order
 
 # If you want different default values, configure it here.
 default_hostname = '127.0.0.1'
@@ -383,16 +384,76 @@ def get_arbitrage(hostname=default_hostname, port=default_port, client_id=defaul
         columns={'index': 'Paths', '0': 'Profits'})
 
 
-def arbitrage_trade(matrix, optimal_path, hostname=default_hostname,
-                    port=default_port, client_id=default_client_id):
+def order(hostname=default_hostname, port=default_port, client_id=default_client_id):
+
+    currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD']
     app = ibkr_app()
     app.connect(hostname, port, client_id)
-    while not app.isConnected():
-        time.sleep(0.01)
+    time.sleep(0.5)
 
     def run_loop():
         app.run()
 
     api_thread = threading.Thread(target=run_loop, daemon=True)
     api_thread.start()
+
     time.sleep(0.5)
+    reqId_serial = 1
+
+    def order3():
+
+        try:
+
+            _,optimal_route_str,_, exchange_dataframe= get_arbitrage(hostname, port, client_id)
+            currency1 = optimal_route_str.split('.')[0]
+            currency2 = optimal_route_str.split('.')[1]
+            currency3 = optimal_route_str.split('.')[2]
+
+
+
+            contract1 = Contract()
+            contract1.symbol = currency1
+            contract1.secType = 'CASH'
+            contract1.currency = currency2
+            contract1.exchange = 'IDEALPRO'
+
+            order1 = Order()
+            order1.action = 'BUY'
+            order1.orderType = 'MKT'
+            order1.totalQuantity = 100000
+
+            c1 = place_order(contract1, order1,hostname,port,client_id)
+
+            contract2 = Contract()
+            contract2.symbol = currency2
+            contract2.secType = 'CASH'
+            contract2.currency = currency3
+            contract2.exchange = 'IDEALPRO'
+
+            order2 = Order()
+            order2.action = 'BUY'
+            order2.orderType = 'MKT'
+            order2.totalQuantity = exchange_dataframe[currency1].loc[[currency2]].value[0] * 100000 * (1 - 0.00002)
+            c2 = place_order(contract2, order2,hostname,port,client_id)
+
+            contract3 = Contract()
+            contract3.symbol = currency3
+            contract3.secType = 'CASH'
+            contract3.currency = currency1
+            contract3.exchange = 'IDEALPRO'
+
+            order3 = Order()
+            order3.action = 'BUY'
+            order3.orderType = 'MKT'
+            order3.totalQuantity = exchange_dataframe[currency2].loc[[currency3]].value[0] * \
+                                   exchange_dataframe[currency1].loc[[currency2]].value[0] * 100000 * (1 - 0.00002) * (
+                                               1 - 0.00002)
+
+            c3 = place_order(contract3, order3,hostname,port,client_id)
+
+            msg = 'order complete'
+
+        except:
+            msg = 'order not complete or exceed max order time'
+
+        return msg
