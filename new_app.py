@@ -1,3 +1,5 @@
+import time
+
 import dash
 from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
@@ -49,30 +51,35 @@ app.layout = html.Div([
                 }),
     html.Br(),
     html.Div([
-        html.H4("Please wait around 20 seconds to process the currency data")],
+        html.H4("Please wait around 10 seconds to process the currency data")],
         style={'color': 'black', 'fontSize': 14, 'textAlign': 'center',
                'marginBottom': 50, 'marginTop': 25}),
 
-    html.Div(
+    dcc.Loading(children=[html.Div(
         id='my_output1',
-        style={'width': '50%', 'align': 'center'}
+        style={'font-weight': 'bold', 'color': 'grey', 'text-align': 'center',
+               'padding': '10'})
+    ], type="circle"
     ),
-    # TODO: 把UI改好看点
-    html.Br(),
-    html.Br(),
-    html.Div(
-        id='my_output2'),
-    html.Br(),
-    html.Br(),
 
+    html.Br(),
+    html.Br(),
 
     html.H2("Section 3: Profits from each path of exchange"),  # store the path of triangular arbitrage
     html.Br(),
     html.Br(),
     html.Div(
-        id='output_paths', style={'width': '50%'}),
+        id='output_paths',
+        style={'font-weight': 'bold', 'color': 'grey', 'text-align': 'center',
+               'padding': '10', 'textAlign': 'center',}
+    ),
     html.Br(),
     html.Br(),
+    html.H3(
+        id='my_output2'),
+    html.Br(),
+    html.Br(),
+
     html.H2('Section 4: Trades and profit'),
     html.Button('trade', id='trade-button', n_clicks=0,
                 style={
@@ -87,7 +94,11 @@ app.layout = html.Div([
                 }),
     html.Br(),
     html.Br(),
-    html.H3(id='div_profit'),
+    dcc.Loading(),
+    dcc.Loading(children=[html.H3(id='div_profit')],
+                type="circle",
+                ),
+
     html.Br(),
     html.Br(),
 
@@ -98,6 +109,7 @@ app.layout = html.Div([
         children='Get Account Balance',
         n_clicks=0
     ),
+    html.Br(),
     html.Div(
         id='account_summary'
     ),
@@ -141,7 +153,10 @@ def arbitrage(n_clicks):
         columns = [{"name": i, "id": i, } for i in (exchange_dataframe.columns)]
         exchange_rate_matrix = dash_table.DataTable(data=data, columns=columns)
         result_table = dash_table.DataTable(data=results.to_dict('rows'))
-        return exchange_rate_matrix, optimal_route_str, result_table
+        [curr1, curr2, curr3] = optimal_route_str.split('.')
+        path_str = f'The optimal strategy is to exchange from {curr1} to {curr2} to {curr3} back to {curr1}, Please ' \
+                   f'click the trade button to execute the optimal strategy '
+        return exchange_rate_matrix, path_str, result_table
 
     else:
         return "please click the button"
@@ -152,9 +167,9 @@ def arbitrage(n_clicks):
     Input(component_id='button_acc', component_property='n_clicks'))
 def clickaccount(n_clicks):
     if n_clicks >= 1:
-        return f'Remaining Balance is {global_balance}'
+        return f'Remaining Balance is {global_balance} USD'
     else:
-        return "please click the button"
+        return "please click the button to get the account balance"
 
 
 @app.callback(
@@ -167,6 +182,7 @@ def clickaccount(n_clicks):
     prevent_initial_call=True
 )
 def trade(n_clicks):
+    time.sleep(2)
     if n_clicks >= 1:
         if global_exchange_rate is None or global_optimal_path is None:
             return 'Exchange data unavailable, please click on arbitrage button first'
@@ -175,9 +191,9 @@ def trade(n_clicks):
             print(global_exchange_rate)
             print(global_optimal_path)
             profit, output_str = get_profit(global_balance,
-                                                    global_currency,
-                                                    global_exchange_rate,
-                                                    global_optimal_path)
+                                            global_currency,
+                                            global_exchange_rate,
+                                            global_optimal_path)
             global_balance += profit
             out_list = list()
             for line in output_str.split('\n'):
@@ -186,8 +202,7 @@ def trade(n_clicks):
             return out_list
 
     else:
-        msg = 'order is not completed'
-        return msg
+        return "Please click the button to execute the optimal strategy"
 
 
 # additional variable
