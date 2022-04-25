@@ -12,6 +12,7 @@ from datetime import datetime
 class ibkr_app(EWrapper, EClient):
     def __init__(self):
         EClient.__init__(self, self)
+        self.data = []  # Initialize variable to store candle
         self.error_messages = pd.DataFrame(columns=[
             'reqId', 'errorCode', 'errorString'
         ])
@@ -49,22 +50,26 @@ class ibkr_app(EWrapper, EClient):
     def currentTime(self, time:int):
         self.current_time = datetime.fromtimestamp(time)
 
-    def historicalData(self, reqId:int, bar:BarData):
-        self.historical_data = pd.concat(
-            [
-                self.historical_data,
-                pd.DataFrame(
-                    {
-                        'date': [bar.date],
-                        'open': [bar.open],
-                        'high': [bar.high],
-                        'low': [bar.low],
-                        'close': [bar.close],
-                    }
-                )
-            ],
-            ignore_index=True
-        )
+    # def historicalData(self, reqId:int, bar:BarData):
+    #     self.historical_data = pd.concat(
+    #         [
+    #             self.historical_data,
+    #             pd.DataFrame(
+    #                 {
+    #                     'date': [bar.date],
+    #                     'open': [bar.open],
+    #                     'high': [bar.high],
+    #                     'low': [bar.low],
+    #                     'close': [bar.close],
+    #                 }
+    #             )
+    #         ],
+    #         ignore_index=True
+    #     )
+
+    def historicalData(self, reqId, bar):
+        print(f'reqId: {reqId} Time: {bar.date} Close: {bar.close}')
+        self.data.append([reqId, bar.date, bar.close])
 
     def historicalDataEnd(self, reqId:int, start:str, end:str):
         self.historical_data_end = reqId

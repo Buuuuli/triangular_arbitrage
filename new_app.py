@@ -2,8 +2,10 @@ import dash
 from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
 from interactive_trader import *
+import plotly.graph_objects as go
 import base64
-from function import *
+
+from interactive_trader.synchronous_functions import get_arbitrage
 from yahoo import *
 import plotly.graph_objects as go
 
@@ -13,22 +15,6 @@ currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD']
 
 image = 'asset/currency.jpeg'
 test_base64 = base64.b64encode(open(image, 'rb').read()).decode('ascii')
-
-# ==========================================
-# exchange_dataframe = fetch_all(ibkr_app, currencies)
-# exchange_dataframe = fill_in_nan(exchange_dataframe)
-# if not check_all_data(exchange_dataframe):
-#     print('Exchange Data Unavailable')
-#     exit(1)
-# # exchange_table = check_all_data(exchange_dataframe)
-# data = exchange_dataframe.to_dict('rows')
-# columns = [{"name": i, "id": i, } for i in exchange_dataframe.columns]
-# results = dict()
-# results = check_all_arbitrage(results, exchange_dataframe, currencies)
-# optimal_route_str = max(results, key=results.get)
-# print(results)
-# print(optimal_route_str)
-# ===========================
 
 app = dash.Dash(__name__)
 server = app.server
@@ -116,27 +102,7 @@ app.layout = html.Div([
 )
 def arbitrage(n_clicks):
     if n_clicks >= 1:
-
-        exchange_dataframe = fetch_all(currencies)
-        print('fetch success')
-
-        exchange_dataframe = fill_in_nan(exchange_dataframe)
-
-        if not check_all_data(exchange_dataframe):
-            print('Exchange Data Unavailable')
-            exit(1)
-
-        # exchange_table = check_all_data(exchange_dataframe)
-
-        data = exchange_dataframe.to_dict('rows')
-        columns = [{"name": i, "id": i, } for i in (exchange_dataframe.columns)]
-
-        results = dict()
-        results = check_all_arbitrage(results, exchange_dataframe, currencies)
-
-        optimal_route_str = max(results, key=results.get)
-
-        return dash_table.DataTable(data=data, columns=columns), optimal_route_str
+        return get_arbitrage()
 
     else:
         return "please click the button"
