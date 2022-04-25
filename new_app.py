@@ -19,6 +19,9 @@ test_base64 = base64.b64encode(open(image, 'rb').read()).decode('ascii')
 app = dash.Dash(__name__)
 server = app.server
 
+global_exchange_rate = None
+global_optimal_path = None
+
 app.layout = html.Div([
     html.Div([
         html.H1('Triangular Arbitrage')], style={'color': '#3258a8', 'fontSize': 14, 'textAlign': 'center',
@@ -49,7 +52,7 @@ app.layout = html.Div([
     html.Div([
         html.H4("Please wait around 20 seconds to process the currency data")],
         style={'color': 'black', 'fontSize': 14, 'textAlign': 'center',
-                                                 'marginBottom': 50, 'marginTop': 25}),
+               'marginBottom': 50, 'marginTop': 25}),
 
     html.Div(
         id='my_output1'
@@ -111,7 +114,10 @@ app.layout = html.Div([
 )
 def arbitrage(n_clicks):
     if n_clicks >= 1:
-        exchange_rate_matrix, optimal_route_str, results = get_arbitrage()
+        exchange_dataframe, optimal_route_str, results = get_arbitrage()
+        data = exchange_dataframe.to_dict('rows')
+        columns = [{"name": i, "id": i, } for i in (exchange_dataframe.columns)]
+        exchange_rate_matrix = dash_table.DataTable(data=data, columns=columns)
         result_table = dash_table.DataTable(data=results.to_dict('rows'))
         return exchange_rate_matrix, optimal_route_str, result_table
 
@@ -130,7 +136,11 @@ def arbitrage(n_clicks):
 )
 def trade(n_clicks):
     if n_clicks >= 1:
-        return
+        if global_exchange_rate == None | global_optimal_path == None:
+            return 'Exchange data unavailable, please click on arbitrage button first'
+        else:
+
+            return
 
     else:
         msg = 'order is not completed'
