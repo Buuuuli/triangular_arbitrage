@@ -271,6 +271,23 @@ def place_order(contract, order, hostname=default_hostname,
     return app.order_status
 
 
+def get_accoutsummary(hostname=default_hostname, port=default_port, client_id=default_client_id):
+    app = ibkr_app()
+    app.connect(hostname, port, client_id)
+    time.sleep(0.5)
+
+    def run_loop():
+        app.run()
+
+    api_thread = threading.Thread(target=run_loop, daemon=True)
+    api_thread.start()
+    time.sleep(0.5)
+    app.reqAccountSummary(1, 'All', 'AvailableFunds')
+    time.sleep(0.5)
+    print(f'available fund = {app.available_fund}, currency = {app.available_fund_currency}')
+    return app.available_fund, app.available_fund_currency
+
+
 def get_arbitrage(hostname=default_hostname, port=default_port, client_id=default_client_id):
     currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD']
     app = ibkr_app()
@@ -358,19 +375,13 @@ def get_arbitrage(hostname=default_hostname, port=default_port, client_id=defaul
         print('Exchange Data Unavailable')
         exit(1)
 
-    data = exchange_dataframe.to_dict('rows')
-    columns = [{"name": i, "id": i, } for i in (exchange_dataframe.columns)]
-
     results = dict()
     results = check_all_arbitrage(results, exchange_dataframe, currencies)
 
     optimal_route_str = max(results, key=results.get)
 
-    return dash_table.DataTable(data=data, columns=columns), \
-           optimal_route_str, \
-           DataFrame.from_dict(results,orient='index').reset_index().rename(
-           columns={'index': 'Paths', '0': 'Profits'}),\
-           exchange_dataframe
+    return exchange_dataframe, optimal_route_str, DataFrame.from_dict(results, orient='index').reset_index().rename(
+        columns={'index': 'Paths', '0': 'Profits'})
 
 
 def order(hostname=default_hostname, port=default_port, client_id=default_client_id):

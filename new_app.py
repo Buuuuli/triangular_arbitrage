@@ -1,12 +1,9 @@
+import time
+
 import dash
 from dash import dcc, html, dash_table
 from dash.dependencies import Input, Output
-from interactive_trader import *
-import plotly.graph_objects as go
 import base64
-
-from interactive_trader.synchronous_functions import get_arbitrage
-from interactive_trader.synchronous_functions import order
 from yahoo import *
 import plotly.graph_objects as go
 
@@ -19,6 +16,11 @@ test_base64 = base64.b64encode(open(image, 'rb').read()).decode('ascii')
 
 app = dash.Dash(__name__)
 server = app.server
+
+global_balance = 1000000
+global_currency = 'USD'
+global_exchange_rate = None
+global_optimal_path = None
 
 app.layout = html.Div([
     html.Div([
@@ -48,19 +50,37 @@ app.layout = html.Div([
                 }),
     html.Br(),
     html.Div([
-        html.H4("Please wait around 20 seconds to process the currency data")],
-        style={'color': 'black', 'fontSize': 14, 'textAlign': 'center',
-                                                 'marginBottom': 50, 'marginTop': 25}),
+        html.H4("Please wait around 10 seconds to process the currency data")],
+        style={'color': 'black', 'fontSize': 15, 'textAlign': 'center',
+               'marginBottom': 50, 'marginTop': 25}),
 
+    dcc.Loading(children=[html.Div(
+        id='my_output1',
+        style={'font-weight': 'bold', 'color': 'grey', 'margin-right': 'auto', 'margin-left': 'auto',
+               'padding': '10', 'width': '70%'})
+    ], type="circle"
+    ),
+
+    html.Br(),
+    html.Br(),
+
+    html.H2("Section 3: Profits from each path of exchange"),  # store the path of triangular arbitrage
+    html.Br(),
+    html.Br(),
     html.Div(
-        id='my_output1'
+        id='output_paths',
+        style={'font-weight': 'bold', 'color': 'grey', 'margin-right': 'auto', 'margin-left': 'auto',
+               'padding': '10', 'width': '50%'}
+
     ),
     html.Br(),
     html.Br(),
-    html.Div(
+    html.H3(
         id='my_output2'),
     html.Br(),
     html.Br(),
+
+    html.H2('Section 4: Trades and profit'),
     html.Button('trade', id='trade-button', n_clicks=0,
                 style={
                     'marginRight': '50px',
@@ -74,17 +94,28 @@ app.layout = html.Div([
                 }),
     html.Br(),
     html.Br(),
-    html.Div(
-        id='my_output3'),
+    dcc.Loading(),
+    dcc.Loading(children=[html.P(id='div_profit',style={'text-align':'center'})],
+                type="circle",
+                ),
 
-    html.H2("Section 3: Profits from each path of exchange"),  # store the path of triangular arbitrage
     html.Br(),
+    html.Br(),
+
+    html.H2("Section 5: Account Balance"),
+    html.Br(),
+    html.Button(
+        id='button_acc',
+        children='Get Account Balance',
+        n_clicks=0
+    ),
     html.Br(),
     html.Div(
-        id='output_paths', style={'width': '50%'}),
+        id='account_summary'
+    ),
 
     # additional variable graph
-    html.H2("Section 4: USD Exchange rate Index (Additional Variable)"),
+    html.H2("Section 6: USD Exchange rate Index (Additional Variable)"),
     html.Br(),
 
     html.Button(
@@ -112,17 +143,38 @@ app.layout = html.Div([
 )
 def arbitrage(n_clicks):
     if n_clicks >= 1:
-        exchange_rate_matrix, optimal_route_str, results = get_arbitrage()
+        exchange_dataframe, optimal_route_str, results = get_arbitrage()
+        global global_exchange_rate
+        global global_optimal_path
+        global_exchange_rate = exchange_dataframe
+        global_optimal_path = optimal_route_str
+        exchange_dataframe = exchange_dataframe.reset_index()
+        data = exchange_dataframe.to_dict('rows')
+        columns = [{"name": i, "id": i, } for i in (exchange_dataframe.columns)]
+        exchange_rate_matrix = dash_table.DataTable(data=data, columns=columns)
         result_table = dash_table.DataTable(data=results.to_dict('rows'))
-        return exchange_rate_matrix, optimal_route_str, result_table
+        [curr1, curr2, curr3] = optimal_route_str.split('.')
+        path_str = f'The optimal strategy is to exchange from {curr1} to {curr2} to {curr3} back to {curr1}, Please ' \
+                   f'click the trade button to execute the optimal strategy '
+        return exchange_rate_matrix, path_str, result_table
 
     else:
         return "please click the button"
 
 
 @app.callback(
+    Output(component_id='account_summary', component_property='children'),
+    Input(component_id='button_acc', component_property='n_clicks'))
+def clickaccount(n_clicks):
+    if n_clicks >= 1:
+        return f'Remaining Balance is {global_balance} USD'
+    else:
+        return "please click the button to get the account balance"
+
+
+@app.callback(
     # We're going to output the result to trade-output
-    Output(component_id='my_output3', component_property='children'),
+    Output(component_id='div_profit', component_property='children'),
 
     # Only run this callback function when the trade-button is pressed
     Input('trade-button', 'n_clicks'),
@@ -130,9 +182,25 @@ def arbitrage(n_clicks):
     prevent_initial_call=True
 )
 def trade(n_clicks):
+    time.sleep(1.5)
     if n_clicks >= 1:
-        a = order()
+        if global_exchange_rate is None or global_optimal_path is None:
+            return 'Exchange data unavailable, please click on arbitrage button first'
+        else:
+            global global_balance
+            profit, output_str = get_profit(global_balance,
+                                            global_currency,
+                                            global_exchange_rate,
+                                            global_optimal_path)
+            global_balance += profit
+            out_list = list()
+            for line in output_str.split('\n'):
+                out_list.append(line)
+                out_list.append(html.Br())
+            return out_list
 
+    else:
+        return "Please click the button to execute the optimal strategy"
 
 
 # additional variable
@@ -155,6 +223,32 @@ def display_candlestick(n_clicks):
 
     fig.update_layout(title='USD Exchange Rate Index')
     return fig
+
+
+def get_profit(balance, currency, matrix, path):
+    print(matrix)
+    output = f'Start with {balance} {currency}\n'
+    [curr1, curr2, curr3] = path.split('.')
+    curr1_amt = balance
+    rate_usd = 1
+    if curr1 != 'USD':
+        curr1_amt = balance * matrix['USD'][curr1]
+        rate_usd = matrix['USD'][curr1]
+        output += f'exchange for {curr1_amt:.4f} {curr1} at the rate of {rate_usd:.4f} {curr1}/USD\n'
+    curr2_amt = curr1_amt * matrix[curr1][curr2]
+    output += f'exchange for {curr2_amt:.4f} {curr2} at the rate of {matrix[curr1][curr2]:.4f} {curr2}/{curr1}\n'
+    curr3_amt = curr2_amt * matrix[curr2][curr3]
+    output += f'exchange for {curr3_amt:.4f} {curr3} at the rate of {matrix[curr2][curr3]:.4f} {curr3}/{curr2}\n'
+    curr1_amt_new = curr3_amt * matrix[curr3][curr1]
+    output += f'exchange for {curr1_amt_new:.4f} {curr1} at the rate of {matrix[curr3][curr1]:.4f} {curr1}/{curr3}\n'
+    usd_amt = curr1_amt_new
+    if curr1 != 'USD':
+        usd_amt = curr1_amt_new * matrix[curr1]['USD']
+        output += f'exchange for {usd_amt:.4f} USD at the rate of {1 / rate_usd:.4f} USD/{curr1}\n'
+    profit = usd_amt - balance
+    output += f'after the triangular trade, you earned ${profit:.4f}'
+    print(output)
+    return profit, output
 
 
 if __name__ == '__main__':
