@@ -52,13 +52,13 @@ app.layout = html.Div([
     html.Br(),
     html.Div([
         html.H4("Please wait around 10 seconds to process the currency data")],
-        style={'color': 'black', 'fontSize': 14, 'textAlign': 'center',
+        style={'color': 'black', 'fontSize': 15, 'textAlign': 'center',
                'marginBottom': 50, 'marginTop': 25}),
 
     dcc.Loading(children=[html.Div(
         id='my_output1',
-        style={'font-weight': 'bold', 'color': 'grey', 'text-align': 'center',
-               'padding': '10'})
+        style={'font-weight': 'bold', 'color': 'grey','margin-right': 'auto', 'margin-left': 'auto',
+               'padding': '10','width': '70%'})
     ], type="circle"
     ),
 
@@ -70,8 +70,9 @@ app.layout = html.Div([
     html.Br(),
     html.Div(
         id='output_paths',
-        style={'font-weight': 'bold', 'color': 'grey', 'text-align': 'center',
-               'padding': '10', 'textAlign': 'center',}
+        style={'font-weight': 'bold', 'color': 'grey', 'margin-right': 'auto', 'margin-left': 'auto',
+               'padding': '10', 'width': '50%'}
+
     ),
     html.Br(),
     html.Br(),
