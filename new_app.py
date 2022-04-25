@@ -70,9 +70,11 @@ app.layout = html.Div([
     html.Div(
         id='my_output3'),
 
-    html.H2("Section 3: Transaction History"),  # store the path of triangular arbitrage
+    html.H2("Section 3: Profits from each path of exchange"),  # store the path of triangular arbitrage
     html.Br(),
     html.Br(),
+    html.Div(
+        id='output_paths', style={'width': '50%'}),
 
     # additional variable graph
     html.H2("Section 4: USD Exchange rate Index (Additional Variable)"),
@@ -93,7 +95,8 @@ app.layout = html.Div([
 @app.callback(
     # We're going to output the result to trade-output
     [Output(component_id='my_output1', component_property='children'),
-     Output(component_id='my_output2', component_property='children')],
+     Output(component_id='my_output2', component_property='children'),
+     Output(component_id='output_paths', component_property='children')],
 
     # Only run this callback function when the trade-button is pressed
     Input('check-button', 'n_clicks'),
@@ -102,7 +105,9 @@ app.layout = html.Div([
 )
 def arbitrage(n_clicks):
     if n_clicks >= 1:
-        return get_arbitrage()
+        exchange_rate_matrix, optimal_route_str, results = get_arbitrage()
+        result_table = dash_table.DataTable(data=results.to_dict('rows'))
+        return exchange_rate_matrix, optimal_route_str, result_table
 
     else:
         return "please click the button"

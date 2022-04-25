@@ -271,7 +271,6 @@ def place_order(contract, order, hostname=default_hostname,
 
 
 def get_arbitrage(hostname=default_hostname, port=default_port, client_id=default_client_id):
-
     currencies = ['USD', 'EUR', 'GBP', 'JPY', 'AUD']
     app = ibkr_app()
     app.connect(hostname, port, client_id)
@@ -366,4 +365,7 @@ def get_arbitrage(hostname=default_hostname, port=default_port, client_id=defaul
 
     optimal_route_str = max(results, key=results.get)
 
-    return dash_table.DataTable(data=data, columns=columns), optimal_route_str
+    return dash_table.DataTable(data=data, columns=columns), \
+           optimal_route_str, \
+           DataFrame.from_dict(results,orient='index').reset_index().rename(
+        columns={'index': 'Paths', '0': 'Profits'})
