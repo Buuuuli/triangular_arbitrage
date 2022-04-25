@@ -6,6 +6,7 @@ import plotly.graph_objects as go
 import base64
 
 from interactive_trader.synchronous_functions import get_arbitrage
+from interactive_trader.synchronous_functions import order
 from yahoo import *
 import plotly.graph_objects as go
 
@@ -130,11 +131,8 @@ def arbitrage(n_clicks):
 )
 def trade(n_clicks):
     if n_clicks >= 1:
-        return
+        a = order()
 
-    else:
-        msg = 'order is not completed'
-        return msg
 
 
 # additional variable
