@@ -226,7 +226,6 @@ def display_candlestick(n_clicks):
 
 
 def get_profit(balance, currency, matrix, path):
-    print(matrix)
     output = f'Start with {balance} {currency}\n'
     [curr1, curr2, curr3] = path.split('.')
     curr1_amt = balance
@@ -247,7 +246,6 @@ def get_profit(balance, currency, matrix, path):
         output += f'exchange for {usd_amt:.4f} USD at the rate of {1 / rate_usd:.4f} USD/{curr1}\n'
     profit = usd_amt - balance
     output += f'after the triangular trade, you earned ${profit:.4f}'
-    print(output)
     return profit, output
 
 

@@ -4,3 +4,4 @@ ibapi
 dash-bootstrap-components
 yfinance
 jupyter
+waitress

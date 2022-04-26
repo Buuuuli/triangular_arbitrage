@@ -1,0 +1,1 @@
+C:\Users\jx119\Desktop\Code\triangular_arbitrage\venv\Scripts\python.exe C:/Users/jx119/Desktop/Code/triangular_arbitrage/server.py
